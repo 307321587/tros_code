@@ -2,9 +2,11 @@
 
 
 
-SensorProcess::SensorProcess(SensorSetting sensor)
+SensorProcess::SensorProcess(SensorSetting sensor_setting)
 {
-    sensor_=sensor;
+    sensor_setting_=sensor_setting;
+    height_=sensor_setting_.mipi_attr.mipi_host_cfg.height;
+    width_=sensor_setting_.mipi_attr.mipi_host_cfg.width;
 }
 
 SensorProcess::~SensorProcess()
@@ -16,14 +18,14 @@ int SensorProcess::sensorSifDevInit()
 {
     // system("echo 1 > /sys/class/vps/mipi_host0/param/stop_check_instart");
     int ret = 0;
-    int devId = sensor_.snsinfo.sensorInfo.dev_port;
-    int pipeId=sensor_.snsinfo.sensorInfo.dev_port;
-    MIPI_SENSOR_INFO_S snsinfo=sensor_.snsinfo;
-    VIN_PIPE_ATTR_S pipeinfo=sensor_.pipeinfo;
-    MIPI_ATTR_S  mipi_attr=sensor_.mipi_attr;
-    VIN_DEV_ATTR_S devinfo=sensor_.devinfo;
-    VIN_DIS_ATTR_S disinfo=sensor_.disinfo;
-    VIN_LDC_ATTR_S ldcinfo=sensor_.ldcinfo;
+    int devId = sensor_setting_.snsinfo.sensorInfo.dev_port;
+    int pipeId=sensor_setting_.snsinfo.sensorInfo.dev_port;
+    MIPI_SENSOR_INFO_S snsinfo=sensor_setting_.snsinfo;
+    VIN_PIPE_ATTR_S pipeinfo=sensor_setting_.pipeinfo;
+    MIPI_ATTR_S  mipi_attr=sensor_setting_.mipi_attr;
+    VIN_DEV_ATTR_S devinfo=sensor_setting_.devinfo;
+    VIN_DIS_ATTR_S disinfo=sensor_setting_.disinfo;
+    VIN_LDC_ATTR_S ldcinfo=sensor_setting_.ldcinfo;
 
     printf("seridesInx:%d\nseridesPort:%d\n",snsinfo.sensorInfo.deserial_index,snsinfo.sensorInfo.deserial_port);
     HB_MIPI_SensorBindSerdes(&snsinfo, snsinfo.sensorInfo.deserial_index, snsinfo.sensorInfo.deserial_port);
@@ -178,80 +180,11 @@ int time_cost_(struct timeval *start, struct timeval *end)
 
 cv::Mat SensorProcess::getImage()
 {
-//    struct timeval time_now = { 0 };
-//    struct timeval time_next = { 0 };
-//    int size = -1;
-//    int ret = 0, i;
-//    int pipeId = sensor_.snsinfo.sensorInfo.dev_port;
-//    std::unique_ptr<hb_vio_buffer_t> yuv_buf=std::make_unique<hb_vio_buffer_t>();
-//    cv::Mat yuv_image,rgb_image;
-//
-//    /* 从VIN模块获取图像帧 */
-//    ret = HB_VIN_GetChnFrame(pipeId, 0, yuv_buf.get(), 2000);
-//    x3_buf_info_print(yuv_buf.get());
-//    if (ret < 0)
-//    {
-//        printf("HB_VIN_GetChnFrame error!!!\n");
-//    }
-//    else
-//    {
-//        gettimeofday(&time_now, NULL);
-//        // 获取图像的宽高
-//        int width = yuv_buf->img_addr.width;
-//        int stride = yuv_buf->img_addr.stride_size;
-//        int height = yuv_buf->img_addr.height;
-//
-//        // 获取图像y,uv地址
-//        char* y_addr = reinterpret_cast<char *>(yuv_buf->img_addr.addr[0]);
-//        char* c_addr = reinterpret_cast<char *>(yuv_buf->img_addr.addr[1]);
-//        auto y_img_len = height * width;
-//        auto uv_img_len = height * width / 2;
-//        auto img_size = y_img_len + uv_img_len;	//yuv图像大小
-//        printf("mat success\n");
-//        std::unique_ptr<char[]>img_addr=std::make_unique<char[]>(img_size);
-//        // 进行转换
-//        if (width == stride) {
-//            std::memcpy(img_addr.get(), y_addr, y_img_len);
-//            std::memcpy(img_addr.get() + y_img_len, c_addr, uv_img_len);
-//        } else {
-//            // copy y data jump over stride
-//            for (int i = 0; i < height; i++)
-//            {
-//                auto src_y_addr = y_addr + i * stride;
-//                auto dst_y_addr = img_addr.get() + i * width;
-//                memcpy(dst_y_addr, src_y_addr, width);
-//                printf("circle2 success\n");
-//            }
-//            // copy uv data jump over stride
-//            auto dst_y_size = width * height;
-//            for (int i = 0; i < height / 2; i++)
-//            {
-//                auto src_c_addr = c_addr + i * stride;
-//                auto dst_c_addr = img_addr.get() + dst_y_size + i * width;
-//                memcpy(dst_c_addr, src_c_addr, width);
-//                printf("circle3 success\n");
-//            }
-//        }
-//        gettimeofday(&time_next, NULL);
-//        int time_cost = time_cost_(&time_now, &time_next);
-//        printf("get img cost time %d ms\n", time_cost);
-//        ret = HB_VIN_ReleaseChnFrame(pipeId, 0, yuv_buf.get());
-//        if (ret < 0) {
-//            printf("HB_VIN_ReleaseChnFrame error!!!\n");
-//        }
-//
-//        yuv_image=cv::Mat(height*3/2,width,CV_8UC1, img_addr.get());
-//        cv::cvtColor(yuv_image, rgb_image, CV_YUV2BGR_NV12);
-//        cv::Rect workRECT(920,80,720,1280);
-//        rgb_image=rgb_image(workRECT);
-//        rotate(rgb_image,rgb_image,ROTATE_90_CLOCKWISE);
-//}
-
     struct timeval time_now = { 0 };
     struct timeval time_next = { 0 };
     int size = -1;
     int ret = 0, i;
-    int pipeId = sensor_.snsinfo.sensorInfo.dev_port;
+    int pipeId = sensor_setting_.snsinfo.sensorInfo.dev_port;
     auto yuv_buf=new hb_vio_buffer_t();
     uint8_t *img_addr;
     cv::Mat yuv_image,rgb_image,resize_model_img;;
@@ -309,9 +242,6 @@ cv::Mat SensorProcess::getImage()
 
         yuv_image = cv::Mat(height * 3 / 2, width, CV_8UC1, img_addr);
         cv::cvtColor(yuv_image, rgb_image, CV_YUV2BGR_NV12);
-
-//        Size model_size=Size(720,1280);
-//        cv::resize(rgb_image,resize_model_img,model_size);
     }
 
     delete(yuv_buf);

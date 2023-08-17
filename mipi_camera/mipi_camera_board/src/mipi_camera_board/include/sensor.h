@@ -38,24 +38,27 @@ typedef struct
     /*定义 ldc 属性信息 */
     VIN_LDC_ATTR_S ldcinfo;
 }SensorSetting;
-
-extern SensorSetting multi_sensors[10];
-// extern std::shared_ptr<dsr_msgs2::msg::QtImage> msg;
 void setF37(SensorSetting& sensor_setting);
+void setImx219(SensorSetting& sensor_setting);
 
 class SensorProcess {
 public:
     SensorProcess(SensorSetting sensor);
     ~SensorProcess();
     int sensorSifDevInit();
-    cv::Mat getImage();
     void print_sensor_info(MIPI_SENSOR_INFO_S *snsinfo);
+
+    cv::Mat getImage();
     cv::Mat transRgbToYuv(cv::Mat rgb_img);
 
+    int getSensorWidth(){return width_;};
+    int getSensorHeight(){return height_;};
 
 private:
-    SensorSetting sensor_;
+    SensorSetting sensor_setting_;
     bool sensor_init_flag = false;
+    int width_=0;
+    int height_=0;
 };
 
 #endif //BUILD_SENSOR_H

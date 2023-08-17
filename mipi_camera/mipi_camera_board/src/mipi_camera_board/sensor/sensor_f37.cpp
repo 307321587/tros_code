@@ -12,7 +12,7 @@
 #include <string.h>
 #include <time.h>
 #include <sys/stat.h>
-#include <sensor.h>
+#include "sensor.h"
 
 #define SENSOR_TAG "F37"
 

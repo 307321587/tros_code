@@ -12,12 +12,12 @@ endif()
 
 # find dependencies
 find_package(ament_cmake REQUIRED)
-# find_package(rosidl_default_generators REQUIRED)
+find_package(rosidl_default_generators REQUIRED)
 # #设置自定义消息
-# rosidl_generate_interfaces(${PROJECT_NAME}
-#   "msg/QtImage.msg"
-# )
-# ament_export_dependencies(rosidl_default_runtime)
+rosidl_generate_interfaces(${PROJECT_NAME}
+  "msg/QtImage.msg"
+)
+ament_export_dependencies(rosidl_default_runtime)
 
 find_package(rclcpp REQUIRED)
 # 设置包根目录
@@ -32,9 +32,10 @@ link_directories(
   ${HOST_PACKAGE_DIR}/lib/pkgconfig
   ${HOST_PACKAGE_DIR}/lib/sensorlib
   ${HOST_PACKAGE_DIR}/lib/udev
+  ${PROJECT_SOURCE_DIR}/lib
 )
 
-set(X3_HAPI_LIB cam vio hbmedia gdcbin isp iar isp_algo tinyalsa multimedia z avformat avcodec avutil dl ion alog diag cjson hbmem rt stdc++ m pthread opencv_world cnn_intf hbrt_bernoulli_aarch64 dnn)
+set(X3_HAPI_LIB cam vio hbmedia gdcbin isp iar isp_algo tinyalsa multimedia z avformat avcodec avutil dl ion alog diag cjson hbmem rt stdc++ m pthread opencv_world cnn_intf hbrt_bernoulli_aarch64 dnn hbspdev spcdev)
 
 include_directories(
   ${PROJECT_SOURCE_DIR}/include
@@ -46,13 +47,13 @@ include_directories(
 file(GLOB SRC_LIST "src/*.cpp")
 file(GLOB Config_LIST "sensor/*.cpp")
 
-add_executable(mipi_camera_board ${Config_LIST} ${SRC_LIST})
-target_link_libraries(mipi_camera_board ${X3_HAPI_LIB})
-ament_target_dependencies(mipi_camera_board rclcpp)
-# rosidl_target_interfaces(mipi_camera_board ${PROJECT_NAME} "rosidl_typesupport_cpp")
+add_executable(mipi_camera ${Config_LIST} ${SRC_LIST})
+target_link_libraries(mipi_camera ${X3_HAPI_LIB})
+ament_target_dependencies(mipi_camera rclcpp)
+rosidl_target_interfaces(mipi_camera ${PROJECT_NAME} "rosidl_typesupport_cpp")
 
 install(TARGETS
-mipi_camera_board
+mipi_camera
   DESTINATION lib/${PROJECT_NAME})
 
 ament_package()
