@@ -40,6 +40,7 @@ typedef struct
 }SensorSetting;
 void setF37(SensorSetting& sensor_setting);
 void setImx219(SensorSetting& sensor_setting);
+void setImx219_2(SensorSetting& sensor_setting);
 
 class SensorProcess {
 public:

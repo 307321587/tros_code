@@ -22,18 +22,18 @@
 #include <sys/stat.h>
 #include "sensor.h"
 
-MIPI_SENSOR_INFO_S SENSOR_2LANE_IMX219_30FPS_10BIT_LINEAR_INFO = {
+MIPI_SENSOR_INFO_S SENSOR_2LANE_IMX219_30FPS_10BIT_LINEAR_INFO_2 = {
 	.deseEnable = 0, // 该 sensor 是否有 serdes（串解器）
 	.inputMode = INPUT_MODE_MIPI, // sensor 接入方式,mipi还是dvp
 	.sensorInfo = {
-		.port = 0, // sensor的逻辑编号，必须从0开始
-		.dev_port = 0, // 每路 sensor 操作的驱动节点，一个驱动支持多个节点。 snsinfo 中的dev_port 必须等于pipeId，多目摄像头设置的时候需要特别注意
+		.port = 1, // sensor的逻辑编号，必须从0开始
+		.dev_port = 1, // 每路 sensor 操作的驱动节点，一个驱动支持多个节点。 snsinfo 中的dev_port 必须等于pipeId，多目摄像头设置的时候需要特别注意
 		.bus_type = 0, // 访问总线类型， 0 是 i2c,1 是 spi
-		.bus_num = 3, // 总线号，根据具体板子硬件原理图确定 , 不配置默认 i2c5
+		.bus_num = 0, // 总线号，根据具体板子硬件原理图确定 , 不配置默认 i2c5
 		.fps = 30, // 帧率，用来选择使用哪一组帧率的sensor参数
 		.resolution = 1080, // sensor 行宽, 必须要和mipi属性配置一致
 		.sensor_addr = 0x10, // sensor i2c 设备地址
-		.entry_index = 0, // sensor 使用的 mipi 索引, 0~3，对应mipi host的序号
+		.entry_index = 2, // sensor 使用的 mipi 索引, 0~3，对应mipi host的序号
 		.sensor_mode = NORMAL_M, // sensor 工作模式， 1 是 normal,2 是dol2,3 是 dol3
 		.reg_width = 16, // sensor 寄存器地址宽度
 		.sensor_name = "imx219", // sensor的名字，在libcam.so中会根据这个名字组合出 libf37.so
@@ -43,7 +43,7 @@ MIPI_SENSOR_INFO_S SENSOR_2LANE_IMX219_30FPS_10BIT_LINEAR_INFO = {
 	}
 };
 
-MIPI_ATTR_S MIPI_2LANE_SENSOR_IMX219_30FPS_10BIT_LINEAR_ATTR = {
+MIPI_ATTR_S MIPI_2LANE_SENSOR_IMX219_30FPS_10BIT_LINEAR_ATTR_2 = {
     .mipi_host_cfg = {
         .lane = 2, // 硬件上sensor用了几个mipi数据lane，f37用的1 lane, os8a10 4K的用了4 lane
         .datatype = 0x2b, // sensor的输出数据类型，请参考 《X3J3平台AIOT媒体系统接口手册.pdf》第3.5.36节 DATA TYPE
@@ -61,7 +61,7 @@ MIPI_ATTR_S MIPI_2LANE_SENSOR_IMX219_30FPS_10BIT_LINEAR_ATTR = {
     .dev_enable = 0 // mipi dev 是否使能， 1是使能， 0 是关闭, 只用开启mipi bypass的开启
 };
 
-VIN_DEV_ATTR_S DEV_ATTR_IMX219_LINEAR_BASE = {
+VIN_DEV_ATTR_S DEV_ATTR_IMX219_LINEAR_BASE_2 = {
     .stSize = { // 输入的数据
 		.format = 0, // 像素格式， format 为 0 代表是raw, 根据 pixel_lenght 来表示究竟是 raw8, raw12 还是 raw16 。
 		.width = 1920, // 数据宽
@@ -109,7 +109,7 @@ VIN_DEV_ATTR_S DEV_ATTR_IMX219_LINEAR_BASE = {
     }
 };
 
-VIN_PIPE_ATTR_S PIPE_ATTR_IMX219_LINEAR_BASE = {
+VIN_PIPE_ATTR_S PIPE_ATTR_IMX219_LINEAR_BASE_2 = {
 	.ddrOutBufNum = 6, // ISP->GDC ddr的buf数量，最少可以设置成 2
 	.snsMode = SENSOR_NORMAL_MODE, // sensor 工作模式，要和MIPI_SENSOR_INFO_S配置的sensor_mode一致
 	.stSize = { // 数据格式同 VIN_DEV_SIZE_S
@@ -128,7 +128,7 @@ VIN_PIPE_ATTR_S PIPE_ATTR_IMX219_LINEAR_BASE = {
 	}
 };
 
-VIN_DIS_ATTR_S DIS_ATTR_IMX219_LINEAR_BASE = {
+VIN_DIS_ATTR_S DIS_ATTR_IMX219_LINEAR_BASE_2 = {
 	.picSize = { // 输入数据宽高
 		.pic_w = 1919, // 需要设置比接入尺寸 -1 的 size, 如果 ISP 输出1920 , 则这里设置 1919
 		.pic_h = 1079, // 需要设置比接入尺寸 -1 的 size
@@ -150,7 +150,7 @@ VIN_DIS_ATTR_S DIS_ATTR_IMX219_LINEAR_BASE = {
 	.disBufNum = 8,
 };
 
-VIN_LDC_ATTR_S LDC_ATTR_IMX219_LINEAR_BASE = {
+VIN_LDC_ATTR_S LDC_ATTR_IMX219_LINEAR_BASE_2 = {
   .ldcEnable = 0, // LDC 是否使能
   .ldcPath = { // 输出类型
 	 .rg_y_only = 0, // ???
@@ -187,20 +187,20 @@ VIN_LDC_ATTR_S LDC_ATTR_IMX219_LINEAR_BASE = {
   }
 };
 
-void setImx219(SensorSetting& sensor_setting)
+void setImx219_2(SensorSetting& sensor_setting)
 {
 	printf("set_sensor_imx219_param\n");
 	/*定义 sensor   初始化的属性信息 */
-	sensor_setting.snsinfo = SENSOR_2LANE_IMX219_30FPS_10BIT_LINEAR_INFO;
+	sensor_setting.snsinfo = SENSOR_2LANE_IMX219_30FPS_10BIT_LINEAR_INFO_2;
 	/*定义 mipi 初始化参数信息 */
-	sensor_setting.mipi_attr = MIPI_2LANE_SENSOR_IMX219_30FPS_10BIT_LINEAR_ATTR;
+	sensor_setting.mipi_attr = MIPI_2LANE_SENSOR_IMX219_30FPS_10BIT_LINEAR_ATTR_2;
 	/*定义 dev 初始化的属性信息 */
-	sensor_setting.devinfo = DEV_ATTR_IMX219_LINEAR_BASE;
+	sensor_setting.devinfo = DEV_ATTR_IMX219_LINEAR_BASE_2;
 	/*定义 pipe 属性信息 */
-	sensor_setting.pipeinfo = PIPE_ATTR_IMX219_LINEAR_BASE;
+	sensor_setting.pipeinfo = PIPE_ATTR_IMX219_LINEAR_BASE_2;
 	/*定义 dis 属性信息 */
-	sensor_setting.disinfo = DIS_ATTR_IMX219_LINEAR_BASE;
+	sensor_setting.disinfo = DIS_ATTR_IMX219_LINEAR_BASE_2;
 	/*定义 ldc 属性信息 */
-	sensor_setting.ldcinfo = LDC_ATTR_IMX219_LINEAR_BASE;
+	sensor_setting.ldcinfo = LDC_ATTR_IMX219_LINEAR_BASE_2;
 	// return sensor_sif_dev_init(multi_sensors[1],1);
 }

@@ -6,7 +6,7 @@
 #include <stdio.h>
 #include <memory>
 #include <rclcpp/rclcpp.hpp>
-#include <mipi_camera_board/msg/qt_image.hpp>
+#include <qt_image/msg/qt_image.hpp>
 using namespace std::chrono_literals;
 /*----------------------------------
 *   msg:QtImage
@@ -27,18 +27,18 @@ class MinimalPublisher : public rclcpp::Node
     
     MinimalPublisher()
     : Node("minimal_publisher"), count_(0) {
-        publisher_ = this->create_publisher<mipi_camera_board::msg::QtImage>("qt_image", 10); // CHANGE
+        publisher_ = this->create_publisher<qt_image::msg::QtImage>("qt_image", 10); // CHANGE
     }
     
     int64_t count=0;
 
-    void send_image(std::shared_ptr<mipi_camera_board::msg::QtImage> message){
+    void send_image(std::shared_ptr<qt_image::msg::QtImage> message){
         publisher_->publish(*message);
         printf("msg send completed!\n");
     }
 
     rclcpp::TimerBase::SharedPtr timer_;
-    rclcpp::Publisher<mipi_camera_board::msg::QtImage>::SharedPtr publisher_; // CHANGE
+    rclcpp::Publisher<qt_image::msg::QtImage>::SharedPtr publisher_; // CHANGE
     size_t count_;
     };
 

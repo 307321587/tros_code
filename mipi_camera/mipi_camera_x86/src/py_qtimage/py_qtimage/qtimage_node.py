@@ -14,6 +14,7 @@ from PyQt5.QtWidgets import QApplication,QWidget,QTextEdit,QVBoxLayout,QPushButt
 from rclpy.executors import MultiThreadedExecutor
 import threading
 import sys
+import time
 
 def letterbox_image(image, target_shape):
     """
@@ -36,6 +37,15 @@ def letterbox_image(image, target_shape):
     canvas = canvas.astype(np.uint8)
     return canvas
 
+
+def get_time_stamp():
+    ct = time.time()
+    local_time = time.localtime(ct)
+    data_head = time.strftime("%Y-%m-%d %H:%M:%S", local_time)
+    data_secs = (ct - int(ct)) * 1000
+    time_stamp = "%s.%03d" % (data_head, data_secs)
+    return time_stamp
+
 class MainWindow(QMainWindow,Ui_MainWindow):
     def __init__(self):
         QMainWindow.__init__(self)
@@ -51,35 +61,56 @@ class MainWindow(QMainWindow,Ui_MainWindow):
         t_.start()
 
     def timer_callback(self):
-        global image_mat
         # rclpy.spin_once(node=self.receiver,timeout_sec=0.001)
-        # image_mat_resize=letterbox_image(image_mat,[self.lb_img.height(),self.lb_img.width()])
-        # image=QImage(image_mat_resize.data,image_mat_resize.shape[1],image_mat_resize.shape[0],image_mat_resize.shape[1]*3,QImage.Format_RGB888)
-        # pix=QPixmap.fromImage(image)
-        # self.show_img(pix)
+        if(self.node.image_mat_left is None):
+            return
+        image_mat_resize=letterbox_image(self.node.image_mat_left,[self.lb_img_left.height(),self.lb_img_left.width()])
+        image=QImage(image_mat_resize.data,image_mat_resize.shape[1],image_mat_resize.shape[0],image_mat_resize.shape[1]*3,QImage.Format_RGB888)
+        pix=QPixmap.fromImage(image)
+        self.lb_img_left.setPixmap(pix)
+
+        image_mat_resize=letterbox_image(self.node.image_mat_right,[self.lb_img_right.height(),self.lb_img_right.width()])
+        image=QImage(image_mat_resize.data,image_mat_resize.shape[1],image_mat_resize.shape[0],image_mat_resize.shape[1]*3,QImage.Format_RGB888)
+        pix=QPixmap.fromImage(image)
+        self.lb_img_right.setPixmap(pix)
+
+
+
     def thread_ros(self):
         
         self.node = Subscriber()
-        rclpy.spin(self.node)
+        self.node.img_show.connect(self.timer_callback)
+        rclpy.spin(self.node.node)
         self.node.destroy_node()
         # rclpy.shutdown()
     
     def show_img(self,pix_map):
         self.lb_img.setPixmap(pix_map)
 
-class Subscriber(Node):
+class Subscriber(QObject):
+    img_show=pyqtSignal()
     def __init__(self):
-        super().__init__('subscriber')
+        QObject.__init__(self)
+        # super().__init__('subscriber')
         # print(threading.current_thread())
-        self.img_subscription = self.create_subscription(QtImage,"qt_image",self.image_callback,100)        #image
+        self.node = Node('subscriber')
+        self.img_subscription = self.node.create_subscription(QtImage,"qt_image",self.image_callback,100)        #image
         self.img_subscription 
+        self.image_mat_left=None
+        self.image_mat_right=None
 
     def image_callback(self, msg):
         global image_mat
+
+        print(get_time_stamp())
         print('image process start...')
-        array=np.array(bytearray(msg.serialize_image), dtype='uint8')
-        image_mat = cv2.imdecode(array, cv2.IMREAD_COLOR)
-        print('image process completed!')
+        array_left=np.array(bytearray(msg.serialize_image_1), dtype='uint8')
+        array_right=np.array(bytearray(msg.serialize_image_2), dtype='uint8')
+        self.image_mat_left = cv2.imdecode(array_left, cv2.IMREAD_COLOR)
+        self.image_mat_right=cv2.imdecode(array_right, cv2.IMREAD_COLOR)
+        self.image_mat_left=cv2.cvtColor(self.image_mat_left,cv2.COLOR_BGR2RGB)
+        self.image_mat_right=cv2.cvtColor(self.image_mat_right,cv2.COLOR_BGR2RGB)
+        self.img_show.emit()
 
 def main(args=None):
     # print(threading.current_thread())

@@ -20,7 +20,7 @@ echo 1 > /sys/class/vps/mipi_host0/param/stop_check_instart
 # echo 1 > /sys/class/vps/mipi_host0/param/stop_check_instart
 # echo 1 > /sys/class/vps/mipi_host1/param/stop_check_instart
 
-i2cdetect -r -y 1
+i2cdetect -r -y 0
 i2cdetect -r -y 3
 
 ros2 run mipi_camera_board mipi_camera

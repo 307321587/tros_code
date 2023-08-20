@@ -7,7 +7,7 @@
 
 #include <sp_codec.h>
 #include <opencv2/opencv.hpp>
-#include <mipi_camera_board/msg/qt_image.hpp>
+#include <qt_image/msg/qt_image.hpp>
 
 #define STREAM_FRAME_SIZE 2097152
 class Encoder
@@ -16,7 +16,7 @@ public:
     Encoder(int width,int height);
     ~Encoder();
 
-    void encode(cv::Mat yuv_img,std::shared_ptr<mipi_camera_board::msg::QtImage> msg);
+    void encode(cv::Mat yuv_img,std::vector<uint8_t>& encode_img);
 
 
 private:

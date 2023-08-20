@@ -4,7 +4,8 @@ uint32 width
 uint32 channel
 
 #image data
-uint8[] serialize_image
+uint8[] serialize_image_1
+uint8[] serialize_image_2
 
 #box num
 uint32 box_n

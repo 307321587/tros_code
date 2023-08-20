@@ -24,8 +24,8 @@ MIPI_SENSOR_INFO_S SENSOR_1LANE_F37_30FPS_10BIT_LINEAR_INFO =
 	.deseEnable = 0, // 该 sensor 是否有 serdes（串解器）
 	.inputMode = INPUT_MODE_MIPI, // sensor 接入方式,mipi还是dvp
 	.sensorInfo = {
-		.port = 2, // sensor的逻辑编号，必须从0开始
-		.dev_port = 2, // 每路 sensor 操作的驱动节点，一个驱动支持多个节点。 snsinfo 中的dev_port 必须等于pipeId，多目摄像头设置的时候需要特别注意
+		.port = 1, // sensor的逻辑编号，必须从0开始
+		.dev_port = 1, // 每路 sensor 操作的驱动节点，一个驱动支持多个节点。 snsinfo 中的dev_port 必须等于pipeId，多目摄像头设置的时候需要特别注意
 		.bus_type = 0, // 访问总线类型， 0 是 i2c,1 是 spi
 		.bus_num = 1, // 总线号，根据具体板子硬件原理图确定 , 不配置默认 i2c5
 		.fps = 30, // 帧率，用来选择使用哪一组帧率的sensor参数
@@ -38,7 +38,7 @@ MIPI_SENSOR_INFO_S SENSOR_1LANE_F37_30FPS_10BIT_LINEAR_INFO =
 		// 这个库文件，然后调用dlopen运行时打开sensor库， libf37.so 这个库的生成
 		// 请参考sensor点亮文档，以f37 为例是 f37_utility.c f37_utility.h
 		// 请放到sdk包的hbre/camera/utility/sensor目录下make生成libf37.so文件
-		.deserial_port=2
+		.deserial_port=1
 	}
 };
 

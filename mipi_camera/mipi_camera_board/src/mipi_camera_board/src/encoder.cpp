@@ -18,7 +18,7 @@ Encoder::~Encoder()
     free(stream_buffer);
 }
 
-void Encoder::encode(cv::Mat yuv_img,std::shared_ptr<mipi_camera_board::msg::QtImage> msg)
+void Encoder::encode(cv::Mat yuv_img,std::vector<uint8_t>& encode_img)
 {
 
     sp_encoder_set_frame(sp_encoder_,(char *)yuv_img.data,data_size);
@@ -28,6 +28,6 @@ void Encoder::encode(cv::Mat yuv_img,std::shared_ptr<mipi_camera_board::msg::QtI
     {
         printf("encoder_get_image error! \n");
     }
-    msg->serialize_image=std::vector<uint8_t>(stream_buffer, stream_buffer+stream_frame_size);
+    encode_img=std::vector<uint8_t>(stream_buffer, stream_buffer+stream_frame_size);
 }
 

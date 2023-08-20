@@ -13,13 +13,15 @@ endif()
 # find dependencies
 find_package(ament_cmake REQUIRED)
 find_package(rosidl_default_generators REQUIRED)
+
 # #设置自定义消息
-rosidl_generate_interfaces(${PROJECT_NAME}
-  "msg/QtImage.msg"
-)
+# rosidl_generate_interfaces(${PROJECT_NAME}
+#   "msg/QtImage.msg"
+# )
 ament_export_dependencies(rosidl_default_runtime)
 
 find_package(rclcpp REQUIRED)
+find_package(qt_image REQUIRED)
 # 设置包根目录
 set(HOST_PACKAGE_DIR /home/lza/cc_ws/sysroot_docker/)
 link_directories(
@@ -49,8 +51,8 @@ file(GLOB Config_LIST "sensor/*.cpp")
 
 add_executable(mipi_camera ${Config_LIST} ${SRC_LIST})
 target_link_libraries(mipi_camera ${X3_HAPI_LIB})
-ament_target_dependencies(mipi_camera rclcpp)
-rosidl_target_interfaces(mipi_camera ${PROJECT_NAME} "rosidl_typesupport_cpp")
+ament_target_dependencies(mipi_camera rclcpp qt_image)
+# rosidl_target_interfaces(mipi_camera ${PROJECT_NAME} "rosidl_typesupport_cpp")
 
 install(TARGETS
 mipi_camera
