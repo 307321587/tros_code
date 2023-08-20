@@ -11,7 +11,8 @@ from PyQt5.QtGui import QPixmap,QImage
 from PyQt5.QtCore import pyqtSignal, QObject,QTimer
 from PyQt5.QtWidgets import QMainWindow
 from PyQt5.QtWidgets import QApplication,QWidget,QTextEdit,QVBoxLayout,QPushButton
-from rclpy import executors
+from rclpy.executors import MultiThreadedExecutor
+import threading
 import sys
 
 def letterbox_image(image, target_shape):
@@ -40,58 +41,44 @@ class MainWindow(QMainWindow,Ui_MainWindow):
         QMainWindow.__init__(self)
         Ui_MainWindow.__init__(self)
         self.setupUi(self)
-        self.receiver = Subscriber()
-        self.timer = QTimer(self)
-        self.timer.timeout.connect(self.timer_callback)
-        self.timer.start(30)
+        # self.receiver = Subscriber()
         # self.receiver.image_show.connect(self.show_img)
         #在界面主线程中开启守护线程启动节点
         # self.thread_ros()
-        # self.node = None
-        # t_ = threading.Thread(target=self.thread_ros, args=())
-        # t_.setDaemon(True)            # 主线程崩掉，守护线程可以自己shutdown
-        # t_.start()
+        self.node = None
+        t_ = threading.Thread(target=self.thread_ros, args=())
+        t_.setDaemon(True)            # 主线程崩掉，守护线程可以自己shutdown
+        t_.start()
 
     def timer_callback(self):
         global image_mat
-        rclpy.spin_once(node=self.receiver,timeout_sec=0.001)
-        image_mat_resize=letterbox_image(image_mat,[self.lb_img.height(),self.lb_img.width()])
-        image=QImage(image_mat_resize.data,image_mat_resize.shape[1],image_mat_resize.shape[0],image_mat_resize.shape[1]*3,QImage.Format_RGB888)
-        pix=QPixmap.fromImage(image)
-        self.show_img(pix)
+        # rclpy.spin_once(node=self.receiver,timeout_sec=0.001)
+        # image_mat_resize=letterbox_image(image_mat,[self.lb_img.height(),self.lb_img.width()])
+        # image=QImage(image_mat_resize.data,image_mat_resize.shape[1],image_mat_resize.shape[0],image_mat_resize.shape[1]*3,QImage.Format_RGB888)
+        # pix=QPixmap.fromImage(image)
+        # self.show_img(pix)
     def thread_ros(self):
         
         self.node = Subscriber()
-        self.node.image_show.connect(self.show_img)
         rclpy.spin(self.node)
         self.node.destroy_node()
-        rclpy.shutdown()
+        # rclpy.shutdown()
     
     def show_img(self,pix_map):
         self.lb_img.setPixmap(pix_map)
 
-class Subscriber(Node,QObject):
-    # image_show=pyqtSignal(QPixmap)
+class Subscriber(Node):
     def __init__(self):
         super().__init__('subscriber')
         # print(threading.current_thread())
         self.img_subscription = self.create_subscription(QtImage,"qt_image",self.image_callback,100)        #image
         self.img_subscription 
-        # self.main_window = MainWindow()  
-        # self.img_subscription  # prevent unused variable warnin
-        # self.image_show.connect(self.main_window.show_img)
-        
 
     def image_callback(self, msg):
         global image_mat
         print('image process start...')
         array=np.array(bytearray(msg.serialize_image), dtype='uint8')
         image_mat = cv2.imdecode(array, cv2.IMREAD_COLOR)
-        # h,w,c=input.shape
-        # image=QImage(input.data,w,h,QImage.Format_RGB888)
-        # pix=QPixmap.fromImage(image)
-        # pix=temp_pix.scaled(show_width,show_height)
-        # self.image_show.emit(temp_pix)
         print('image process completed!')
 
 def main(args=None):
