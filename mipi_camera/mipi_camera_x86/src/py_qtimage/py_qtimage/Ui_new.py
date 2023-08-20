@@ -18,9 +18,14 @@ class Ui_MainWindow(object):
         self.centralwidget.setObjectName("centralwidget")
         self.verticalLayout = QtWidgets.QVBoxLayout(self.centralwidget)
         self.verticalLayout.setObjectName("verticalLayout")
-        self.label_image = QtWidgets.QLabel(self.centralwidget)
-        self.label_image.setObjectName("label_image")
-        self.verticalLayout.addWidget(self.label_image)
+        self.lb_img = QtWidgets.QLabel(self.centralwidget)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Ignored, QtWidgets.QSizePolicy.Ignored)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.lb_img.sizePolicy().hasHeightForWidth())
+        self.lb_img.setSizePolicy(sizePolicy)
+        self.lb_img.setObjectName("lb_img")
+        self.verticalLayout.addWidget(self.lb_img)
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(MainWindow)
         self.menubar.setGeometry(QtCore.QRect(0, 0, 858, 22))
@@ -36,4 +41,4 @@ class Ui_MainWindow(object):
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
-        self.label_image.setText(_translate("MainWindow", "TextLabel"))
+        self.lb_img.setText(_translate("MainWindow", "TextLabel"))
