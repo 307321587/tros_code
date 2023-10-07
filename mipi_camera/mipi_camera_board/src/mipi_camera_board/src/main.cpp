@@ -2,6 +2,8 @@
 // Created by lza on 6/16/23.
 //
 
+// #define STEREO
+
 #include <unistd.h>
 #include "sensor.h"
 #include "encoder.h"
@@ -14,18 +16,19 @@ int main(int argc, char *argv[])
     setImx219(sensor_setting_imx219);
     SensorProcess sensor_imx219(sensor_setting_imx219);
     sensor_imx219.sensorSifDevInit();
+#ifdef STEREO
     // 初始化相继 imx2192
     SensorSetting sensor_setting_imx219_2;
     setImx219_2(sensor_setting_imx219_2);
     SensorProcess sensor_imx219_2(sensor_setting_imx219_2);
     sensor_imx219_2.sensorSifDevInit();
+#endif
 
     // 初始化编码模块        
-    Encoder jpeg_encoder_imx219(sensor_imx219.getSensorWidth(),sensor_imx219.getSensorHeight());
-
+    Encoder jpeg_encoder_imx219(1920,1080);
+#ifdef STEREO
     Encoder jpeg_encoder_imx219_2(sensor_imx219_2.getSensorWidth(),sensor_imx219_2.getSensorHeight());
-
-
+#endif
     // 初始化rcl
     std::shared_ptr<MinimalPublisher> pub;
     std::shared_ptr<qt_image::msg::QtImage> msg;
@@ -40,18 +43,29 @@ int main(int argc, char *argv[])
     while (rclcpp::ok()){
 
         printf("try to get img...\n");
-        img_imx219_2=sensor_imx219_2.getImage();
         img_imx219=sensor_imx219.getImage();
-        // cv::imwrite("test.jpg",img);
+
+   
+        cv::imwrite("test.jpg",img_imx219);
+
+#ifdef STEREO
+        img_imx219_2=sensor_imx219_2.getImage();    
+        cv::Mat ir_image;
+        cv::cvtColor(img_imx219,ir_image,cv::COLOR_BGR2GRAY);
+        cv::imwrite("ir_image.jpg",ir_image);
+
         
         yuv_img_imx219_2=sensor_imx219_2.transRgbToYuv(img_imx219_2);
-        jpeg_encoder_imx219_2.encode(yuv_img_imx219_2,encode_img_1);
-
+        jpeg_encoder_imx219_2.encode(yuv_img_imx219_2,encode_img_2);
+#endif
         yuv_img_imx219=sensor_imx219.transRgbToYuv(img_imx219);
-        jpeg_encoder_imx219.encode(yuv_img_imx219,encode_img_2);
+        jpeg_encoder_imx219.encode(yuv_img_imx219,encode_img_1);
 
         msg->serialize_image_1=encode_img_1;
+#ifdef STEREO
         msg->serialize_image_2=encode_img_2;
+#endif
+
 
         pub->send_image(msg);
         loop_rate.sleep();

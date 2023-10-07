@@ -187,7 +187,7 @@ cv::Mat SensorProcess::getImage()
     int pipeId = sensor_setting_.snsinfo.sensorInfo.dev_port;
     auto yuv_buf=new hb_vio_buffer_t();
     uint8_t *img_addr;
-    cv::Mat yuv_image,rgb_image,resize_model_img;;
+    cv::Mat yuv_image,rgb_image,resize_model_img,resized_image;
 
     /* 从VIN模块获取图像帧 */
     ret = HB_VIN_GetChnFrame(pipeId, 0, yuv_buf, 2000);
@@ -246,7 +246,13 @@ cv::Mat SensorProcess::getImage()
 
     delete(yuv_buf);
     free(img_addr);
-    return rgb_image;
+    // return rgb_image;
+
+
+    int new_height = static_cast<int>(rgb_image.cols / (static_cast<double>(1920) / 1080));  
+    cv::resize(rgb_image, resized_image, cv::Size(1920, new_height), cv::INTER_LINEAR);  
+    resized_image = resized_image(cv::Rect(0, (new_height - 1080) / 2, 1920, 1080));  
+    return resized_image;
 }
 
 cv::Mat SensorProcess::transRgbToYuv(cv::Mat rgb_img)

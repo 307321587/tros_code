@@ -1,6 +1,6 @@
 #!/bin/bash
-source /home/lza/cc_ws/tros_ws/install/setup.bash
-source install/setup.bash
+source /home/lithcado/workspace/tros_ws/install/setup.bash
+# source install/setup.bash
 export TARGET_ARCH=aarch64
 export TARGET_TRIPLE=aarch64-linux-gnu
 export CROSS_COMPILE=/opt/gcc-ubuntu-9.3.0-2020.03-x86_64-aarch64-linux-gnu/bin/$TARGET_TRIPLE-

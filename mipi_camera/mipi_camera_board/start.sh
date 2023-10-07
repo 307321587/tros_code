@@ -1,5 +1,5 @@
 #!/bin/sh
-cd /app/code_liu/code_liu/tros_code/mipi_camera/mipi_camera_board/
+cd /app/code_li/mipi_camera/mipi_camera_board/
 source /opt/tros/setup.bash
 source install/local_setup.bash
 
@@ -17,7 +17,7 @@ echo 1 > /sys/class/vps/mipi_host0/param/snrclk_en
 echo 24000000 > /sys/class/vps/mipi_host0/param/snrclk_freq
 
 echo 1 > /sys/class/vps/mipi_host0/param/stop_check_instart
-# echo 1 > /sys/class/vps/mipi_host0/param/stop_check_instart
+echo 1 > /sys/class/vps/mipi_host2/param/stop_check_instart
 # echo 1 > /sys/class/vps/mipi_host1/param/stop_check_instart
 
 i2cdetect -r -y 0

@@ -23,7 +23,7 @@ ament_export_dependencies(rosidl_default_runtime)
 find_package(rclcpp REQUIRED)
 find_package(qt_image REQUIRED)
 # 设置包根目录
-set(HOST_PACKAGE_DIR /home/lza/cc_ws/sysroot_docker/)
+set(HOST_PACKAGE_DIR /home/lithcado/workspace/sysroot_docker/)
 link_directories(
   ${HOST_PACKAGE_DIR}/lib
   ${HOST_PACKAGE_DIR}/usr_x3/lib

@@ -1,7 +1,7 @@
 # Copyright (c) 2018, ARM Limited.
 # SPDX-License-Identifier: Apache-2.0
 
-set(TROS_PATH /home/lza/cc_ws/tros_ws)
+set(TROS_PATH /home/lithcado/workspace/tros_ws)
 set(CMAKE_SYSTEM_NAME Linux)
 set(CMAKE_SYSTEM_VERSION 1)
 set(CMAKE_SYSTEM_PROCESSOR aarch64)
