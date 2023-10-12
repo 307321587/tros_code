@@ -2,6 +2,9 @@ install/
 log/
 build/
 
+*.yuv
+.vscode/*
+
 # Ignore generated docs
 *.dox
 *.wikidoc
