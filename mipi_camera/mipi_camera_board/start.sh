@@ -1,5 +1,5 @@
 #!/bin/sh
-cd /app/code_li/mipi_camera/mipi_camera_board/
+cd /app/code_li/stereo/mipi_camera/mipi_camera_board/
 source /opt/tros/setup.bash
 source install/local_setup.bash
 

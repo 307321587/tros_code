@@ -187,7 +187,8 @@ cv::Mat SensorProcess::getImage()
     int pipeId = sensor_setting_.snsinfo.sensorInfo.dev_port;
     auto yuv_buf=new hb_vio_buffer_t();
     uint8_t *img_addr;
-    cv::Mat yuv_image,rgb_image,resize_model_img,resized_image;
+    cv::Mat yuv_image,rgb_image,resize_model_img;
+    gettimeofday(&time_now, NULL);
 
     /* 从VIN模块获取图像帧 */
     ret = HB_VIN_GetChnFrame(pipeId, 0, yuv_buf, 2000);
@@ -197,7 +198,6 @@ cv::Mat SensorProcess::getImage()
         printf("HB_VIN_GetChnFrame error!!!\n");
     }
     else {
-        gettimeofday(&time_now, NULL);
         // 获取图像的宽高
         int width = yuv_buf->img_addr.width;
         int stride = yuv_buf->img_addr.stride_size;
@@ -232,9 +232,7 @@ cv::Mat SensorProcess::getImage()
                 printf("circle3 success\n");
             }
         }
-        gettimeofday(&time_next, NULL);
-        int time_cost = time_cost_(&time_now, &time_next);
-        printf("get img cost time %d ms\n", time_cost);
+
         ret = HB_VIN_ReleaseChnFrame(pipeId, 0, yuv_buf);
         if (ret < 0) {
             printf("HB_VIN_ReleaseChnFrame error!!!\n");
@@ -242,17 +240,23 @@ cv::Mat SensorProcess::getImage()
 
         yuv_image = cv::Mat(height * 3 / 2, width, CV_8UC1, img_addr);
         cv::cvtColor(yuv_image, rgb_image, CV_YUV2BGR_NV12);
+        gettimeofday(&time_next, NULL);
+        int time_cost = time_cost_(&time_now, &time_next);
+        printf("get img cost time %d ms\n", time_cost);
     }
 
     delete(yuv_buf);
     free(img_addr);
-    // return rgb_image;
+    return rgb_image;
 
 
-    int new_height = static_cast<int>(rgb_image.cols / (static_cast<double>(1920) / 1080));  
-    cv::resize(rgb_image, resized_image, cv::Size(1920, new_height), cv::INTER_LINEAR);  
-    resized_image = resized_image(cv::Rect(0, (new_height - 1080) / 2, 1920, 1080));  
-    return resized_image;
+    // int new_height = static_cast<int>(rgb_image.cols / (static_cast<double>(1920) / 1080));  
+    // cv::resize(rgb_image, resized_image, cv::Size(1920, new_height), cv::INTER_LINEAR);  
+    // resized_image = resized_image(cv::Rect(0, (new_height - 1080) / 2, 1920, 1080));  
+    // gettimeofday(&time_next, NULL);
+
+
+    // return resized_image;
 }
 
 cv::Mat SensorProcess::transRgbToYuv(cv::Mat rgb_img)
